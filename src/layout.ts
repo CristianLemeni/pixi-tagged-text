@@ -10,6 +10,11 @@ import {
 } from "./functionalUtils";
 import { getFontPropertiesOfText } from "./pixiUtils";
 import * as PIXI from "pixi.js";
+import {Point as PixiPoint} from "@pixi/math"
+import {Rectangle as PixiRectangle} from "@pixi/math"
+import { Text } from "@pixi/text";
+
+
 import {
   Align,
   Bounds,
@@ -38,7 +43,7 @@ import {
 
 const ICON_SCALE_BASE = 0.8;
 
-const sizer = new PIXI.Text("");
+const sizer = new Text("");
 
 /**
  * Translates the current location point to the beginning of the next line.
@@ -51,7 +56,7 @@ export const updateOffsetForNewLine = (
   offset: Point,
   largestLineHeight: number,
   lineSpacing: number
-): Point => new PIXI.Point(0, offset.y + largestLineHeight + lineSpacing);
+): Point => new PixiPoint(0, offset.y + largestLineHeight + lineSpacing);
 
 const rectFromContainer = (
   container: PIXI.Container,
@@ -62,7 +67,7 @@ const rectFromContainer = (
   const x = offset.x + container.x;
   const y = offset.y + container.y;
 
-  return new PIXI.Rectangle(x, y, w, h);
+  return new PixiRectangle(x, y, w, h);
 };
 
 /**

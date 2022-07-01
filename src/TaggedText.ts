@@ -1,4 +1,3 @@
-import * as PIXI from "pixi.js";
 import {
   TaggedTextOptions,
   TextStyleSet,
@@ -34,6 +33,12 @@ import { calculateFinalTokens, getBoundsNested } from "./layout";
 import { capitalize } from "./stringUtil";
 import { fontSizeStringToNumber } from "./pixiUtils";
 import { logWarning as _logWarning } from "./errorMessaging";
+
+import { IDestroyOptions, Container, DisplayObject } from "@pixi/display";
+import { Sprite } from "@pixi/sprite";
+import { Text } from "@pixi/text";
+import { Graphics } from "@pixi/graphics";
+import { Texture, BaseTexture } from "@pixi/core";
 
 export const DEFAULT_OPTIONS: TaggedTextOptions = {
   debug: false,
@@ -72,12 +77,12 @@ const DEFAULT_STYLE_SET = { default: DEFAULT_STYLE };
 Object.freeze(DEFAULT_STYLE_SET);
 Object.freeze(DEFAULT_STYLE);
 
-const DEFAULT_DESTROY_OPTIONS: PIXI.IDestroyOptions = {
+const DEFAULT_DESTROY_OPTIONS: IDestroyOptions = {
   children: true,
   texture: true,
 };
 
-export default class TaggedText extends PIXI.Sprite {
+export default class TaggedText extends Sprite {
   public static get defaultStyles(): TextStyleSet {
     return DEFAULT_STYLE_SET;
   }
@@ -271,41 +276,41 @@ export default class TaggedText extends PIXI.Sprite {
   }
 
   // References to internal elements.
-  private _textFields: PIXI.Text[] = [];
-  public get textFields(): PIXI.Text[] {
+  private _textFields: Text[] = [];
+  public get textFields(): Text[] {
     return this._textFields;
   }
-  private _sprites: PIXI.Sprite[] = [];
-  public get sprites(): PIXI.Sprite[] {
+  private _sprites: Sprite[] = [];
+  public get sprites(): Sprite[] {
     return this._sprites;
   }
-  private _decorations: PIXI.Graphics[] = [];
-  public get decorations(): PIXI.Graphics[] {
+  private _decorations: Graphics[] = [];
+  public get decorations(): Graphics[] {
     return this._decorations;
   }
   private _spriteTemplates: ImageMap = {};
   public get spriteTemplates(): ImageMap {
     return this._spriteTemplates;
   }
-  private _debugGraphics: PIXI.Graphics;
+  private _debugGraphics: Graphics;
 
   // Containers for children
-  private _textContainer: PIXI.Container;
-  public get textContainer(): PIXI.Container {
+  private _textContainer: Container;
+  public get textContainer(): Container {
     return this._textContainer;
   }
 
-  private _decorationContainer: PIXI.Container;
-  public get decorationContainer(): PIXI.Container {
+  private _decorationContainer: Container;
+  public get decorationContainer(): Container {
     return this._decorationContainer;
   }
 
-  private _spriteContainer: PIXI.Container;
-  public get spriteContainer(): PIXI.Container {
+  private _spriteContainer: Container;
+  public get spriteContainer(): Container {
     return this._spriteContainer;
   }
-  private _debugContainer: PIXI.Container;
-  public get debugContainer(): PIXI.Container {
+  private _debugContainer: Container;
+  public get debugContainer(): Container {
     return this._debugContainer;
   }
 
@@ -320,15 +325,15 @@ export default class TaggedText extends PIXI.Sprite {
     text = "",
     tagStyles: TextStyleSet = {},
     options: TaggedTextOptions = {},
-    texture?: PIXI.Texture
+    texture?: Texture
   ) {
     super(texture);
 
-    this._textContainer = new PIXI.Container();
-    this._spriteContainer = new PIXI.Container();
-    this._decorationContainer = new PIXI.Container();
-    this._debugContainer = new PIXI.Container();
-    this._debugGraphics = new PIXI.Graphics();
+    this._textContainer = new Container();
+    this._spriteContainer = new Container();
+    this._decorationContainer = new Container();
+    this._debugContainer = new Container();
+    this._debugGraphics = new Graphics();
 
     this.resetChildren();
 
@@ -365,8 +370,8 @@ export default class TaggedText extends PIXI.Sprite {
     });
   }
 
-  public destroy(options?: boolean | PIXI.IDestroyOptions): void {
-    let destroyOptions: PIXI.IDestroyOptions = {};
+  public destroy(options?: boolean | IDestroyOptions): void {
+    let destroyOptions: IDestroyOptions = {};
     if (typeof options === "boolean") {
       options = { children: options };
     }
@@ -398,28 +403,28 @@ export default class TaggedText extends PIXI.Sprite {
       this._textContainer.removeChildren();
       this.removeChild(this._textContainer);
     }
-    this._textContainer = new PIXI.Container();
+    this._textContainer = new Container();
     this.addChild(this._textContainer);
 
     if (this._spriteContainer) {
       this._spriteContainer.removeChildren();
       this.removeChild(this._spriteContainer);
     }
-    this._spriteContainer = new PIXI.Container();
+    this._spriteContainer = new Container();
     this.addChild(this._spriteContainer);
 
     if (this._decorationContainer) {
       this._decorationContainer.removeChildren();
       this.removeChild(this._decorationContainer);
     }
-    this._decorationContainer = new PIXI.Container();
+    this._decorationContainer = new Container();
     this.addChild(this._decorationContainer);
 
     if (this._debugContainer) {
       this._debugContainer.removeChildren();
       this.removeChild(this._debugContainer);
     }
-    this._debugContainer = new PIXI.Container();
+    this._debugContainer = new Container();
     this.addChild(this._debugContainer);
 
     this._textFields = [];
@@ -444,17 +449,17 @@ export default class TaggedText extends PIXI.Sprite {
       );
       let error: Error | null = null;
 
-      let sprite: PIXI.Sprite = new PIXI.Sprite();
+      let sprite: Sprite = new Sprite();
 
       try {
-        if (spriteSource instanceof PIXI.Sprite) {
+        if (spriteSource instanceof Sprite) {
           sprite = spriteSource;
         }
         // if the entry is not a sprite, attempt to load the sprite as if it is a reference to the sprite source (e.g. an Image element, url, or texture).
         else if (isSpriteSource(spriteSource)) {
-          sprite = PIXI.Sprite.from(spriteSource);
+          sprite = Sprite.from(spriteSource);
         } else if (isTextureSource(spriteSource)) {
-          sprite = PIXI.Sprite.from(PIXI.Texture.from(spriteSource));
+          sprite = Sprite.from(Texture.from(spriteSource));
         } else {
           error = wrongFormatError;
           console.log(error);
@@ -466,7 +471,7 @@ export default class TaggedText extends PIXI.Sprite {
 
       if (
         (isSpriteSource(spriteSource) &&
-          (spriteSource as PIXI.Texture).baseTexture === null) ||
+          (spriteSource as Texture).baseTexture === null) ||
         (sprite !== undefined &&
           (sprite.destroyed || sprite.texture?.baseTexture === null))
       ) {
@@ -481,7 +486,7 @@ export default class TaggedText extends PIXI.Sprite {
       // Listen for changes to sprites (e.g. when they load.)
       const texture = sprite.texture;
 
-      const onTextureUpdate = (baseTexture: PIXI.BaseTexture) => {
+      const onTextureUpdate = (baseTexture: BaseTexture) => {
         this.onImageTextureUpdate(baseTexture);
         baseTexture.removeListener("update", onTextureUpdate);
       };
@@ -497,7 +502,7 @@ export default class TaggedText extends PIXI.Sprite {
     });
   }
 
-  private onImageTextureUpdate(baseTexture: PIXI.BaseTexture): void {
+  private onImageTextureUpdate(baseTexture: BaseTexture): void {
     baseTexture;
     this._needsUpdate = true;
     this._needsDraw = true;
@@ -621,27 +626,27 @@ export default class TaggedText extends PIXI.Sprite {
         this.tokensFlat.filter(isNotWhitespaceToken);
 
     let drewDecorations = false;
-    let displayObject: PIXI.DisplayObject;
+    let displayObject: DisplayObject;
 
     tokens.forEach((t) => {
       if (isTextToken(t)) {
         displayObject = this.createTextFieldForToken(t as TextFinalToken);
         textContainer.addChild(displayObject);
-        this.textFields.push(displayObject as PIXI.Text);
+        this.textFields.push(displayObject as Text);
 
         if (t.textDecorations && t.textDecorations.length > 0) {
           for (const d of t.textDecorations) {
             const drawing = this.createDrawingForTextDecoration(d);
-            (displayObject as PIXI.Text).addChild(drawing);
+            (displayObject as Text).addChild(drawing);
             this._decorations.push(drawing);
           }
           drewDecorations = true;
         }
       }
       if (isSpriteToken(t)) {
-        displayObject = t.content as PIXI.Sprite;
+        displayObject = t.content as Sprite;
 
-        this.sprites.push(displayObject as PIXI.Sprite);
+        this.sprites.push(displayObject as Sprite);
         spriteContainer.addChild(displayObject);
       }
 
@@ -665,10 +670,10 @@ export default class TaggedText extends PIXI.Sprite {
 
   private createDrawingForTextDecoration(
     textDecoration: TextDecorationMetrics
-  ): PIXI.Graphics {
+  ): Graphics {
     const { bounds } = textDecoration;
     let { color } = textDecoration;
-    const drawing = new PIXI.Graphics();
+    const drawing = new Graphics();
 
     if (typeof color === "string") {
       if (color.indexOf("#") === 0) {
@@ -690,7 +695,7 @@ export default class TaggedText extends PIXI.Sprite {
     return drawing;
   }
 
-  private createTextFieldForToken(token: TextFinalToken): PIXI.Text {
+  private createTextFieldForToken(token: TextFinalToken): Text {
     const { textTransform = "" } = token.style;
 
     let text = token.content;
@@ -710,7 +715,7 @@ export default class TaggedText extends PIXI.Sprite {
     const alignClassic = convertUnsupportedAlignment(token.style.align);
     const sanitizedStyle = { ...token.style, align: alignClassic };
 
-    const textField = new PIXI.Text(text, sanitizedStyle);
+    const textField = new Text(text, sanitizedStyle);
 
     let { fontScaleWidth = 1.0, fontScaleHeight = 1.0 } = token.style;
     fontScaleWidth =
@@ -795,7 +800,7 @@ export default class TaggedText extends PIXI.Sprite {
 
   public drawDebug(): void {
     const paragraph = this.tokens;
-    this._debugGraphics = new PIXI.Graphics();
+    this._debugGraphics = new Graphics();
     if (this.debugContainer === null) {
       throw new Error(
         "Somehow the debug container is null. This shouldn't be possible. Perhaps you've destroyed this object?"
@@ -820,8 +825,8 @@ export default class TaggedText extends PIXI.Sprite {
     // g.drawRect(0, 0, width - 1, height - 1);
     // // g.endFill();
 
-    function createInfoText(text: string, position: Point): PIXI.Text {
-      const info = new PIXI.Text(text, DEBUG.TEXT_STYLE);
+    function createInfoText(text: string, position: Point): Text {
+      const info = new Text(text, DEBUG.TEXT_STYLE);
       info.x = position.x + 1;
       info.y = position.y + 1;
       return info;
@@ -833,7 +838,7 @@ export default class TaggedText extends PIXI.Sprite {
       const lineBounds = getBoundsNested(line);
 
       if (this.defaultStyle.wordWrap) {
-        const w = this.defaultStyle.wordWrapWidth ?? this.width;
+        const w: any = this.defaultStyle.wordWrapWidth ?? this.width;
         g.endFill()
           .lineStyle(0.5, DEBUG.LINE_COLOR, 0.2)
           .drawRect(0, lineBounds.y, w, lineBounds.height)

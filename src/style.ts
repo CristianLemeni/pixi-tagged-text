@@ -1,5 +1,6 @@
 import { stringIsNumber } from "./stringUtil";
 import { combineRecords, isDefined, pluck } from "./functionalUtils";
+
 import {
   AttributesList,
   TagWithAttributes,
@@ -28,7 +29,8 @@ import {
   AlignClassic,
 } from "./types";
 import { cloneSprite } from "./pixiUtils";
-import * as PIXI from "pixi.js";
+
+import { Sprite } from "@pixi/sprite";
 
 export const DEFAULT_STYLE: TextStyleExtended = {
   valign: "baseline",
@@ -217,7 +219,7 @@ export const mapTagsToStyles = (
           `An image tag with ${IMG_REFERENCE_PROPERTY}="${imgKey}" was encountered, but there was no matching sprite in the sprite map. Please include a valid Sprite in the imgMap property in the options in your TaggedText constructor.`
         );
       }
-      if (sprite instanceof PIXI.Sprite === false) {
+      if (sprite instanceof Sprite === false) {
         throw new Error(
           `The image reference you provided for "${imgKey}" is not a Sprite. The imgMap can only accept PIXI.Sprite instances.`
         );
