@@ -35,7 +35,13 @@
     "2d"
   ],
   "peerDependencies": {
-    "pixi.js": "^6"
+    "@pixi/display": ">=6.0.0",
+    "@pixi/sprite": ">=6.0.0",
+    "@pixi/text": ">=6.0.0",
+    "@pixi/graphics": ">=6.0.0",
+    "@pixi/utils": ">=6.0.0",
+    "@pixi/core": ">=6.0.0",
+    "@pixi/math": ">=6.0.0"
   },
   "dependencies": {
     "emoji-regex": "9.2.2"
